@@ -1,6 +1,5 @@
 const cors = require('cors');
 const express = require('express');
-const net = require('node:net');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,6 +10,19 @@ app.use((req, _res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
+
+function isIPv4(ip) {
+  if (typeof ip !== 'string') return false;
+  const parts = ip.split('.');
+  if (parts.length !== 4) return false;
+  for (let part of parts) {
+    if (!/^\d+$/.test(part)) return false;
+    const num = parseInt(part, 10);
+    if (num < 0 || num > 254) return false;
+    if (part.length > 1 && part.startsWith('0')) return false;
+  }
+  return true;
+}
 
 app.get('/health', (_req, res) => {
   console.log('[Backend] Health check requested.');
@@ -28,12 +40,15 @@ app.post('/api/validate-ip', (req, res) => {
     });
   }
 
-  const version = net.isIP(ip);
+  let version = 0;
+  if (isIPv4(ip)) {
+    version = 4;
+  }
 
   const response = {
     ip,
     isValid: version !== 0,
-    version: version === 4 ? 'IPv4' : version === 6 ? 'IPv6' : null
+    version: version === 4 ? 'IPv4' : null
   };
 
   console.log('[Backend] Validation result:', response);

@@ -96,7 +96,7 @@ button:disabled {
 }
 
 .result span {
-	font-weight: 700;
+	font-weight: 2000;
 }
 
 @media (max-width: 560px) {
