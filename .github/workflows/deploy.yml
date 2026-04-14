@@ -69,13 +69,12 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           set -euo pipefail
-          kubectl create namespace nemes-balazs-ferenc --dry-run=client -o yaml | kubectl apply -f -
           kubectl create secret docker-registry ghcr-auth-secret \
             --docker-server=ghcr.io \
             --docker-username="ruthl7" \
             --docker-password="$GHCR_TOKEN" \
             -n nemes-balazs-ferenc \
-            --dry-run=client -o yaml | kubectl apply -f -
+            --dry-run=client -o yaml | kubectl apply -n nemes-balazs-ferenc -f -
 
       - name: Deploy to Kubernetes
         shell: bash
