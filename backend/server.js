@@ -18,7 +18,7 @@ function isIPv4(ip) {
   for (let part of parts) {
     if (!/^\d+$/.test(part)) return false;
     const num = parseInt(part, 10);
-    if (num < 0 || num > 254) return false;
+    if (num < 0 || num > 255) return false;
     if (part.length > 1 && part.startsWith('0')) return false;
   }
   return true;
