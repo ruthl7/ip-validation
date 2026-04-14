@@ -52,3 +52,41 @@ jobs:
           tags: |
             ghcr.io/${{ steps.owner.outputs.value }}/ip-validator-frontend:latest
             ghcr.io/${{ steps.owner.outputs.value }}/ip-validator-frontend:${{ github.sha }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubeconfig
+        shell: bash
+        env:
+          KUBECTL: ${{ secrets.KUBECTL }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.kube"
+          if echo "$KUBECTL" | grep -q "apiVersion:"; then
+            printf "%s" "$KUBECTL" > "$HOME/.kube/config"
+          else
+            printf "%s" "$KUBECTL" | base64 -d > "$HOME/.kube/config"
+          fi
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Ensure GHCR image pull secret
+        shell: bash
+        env:
+          OWNER: ${{ steps.owner.outputs.value }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          set -euo pipefail
+          kubectl create secret docker-registry ghcr-auth-secret \
+            --docker-server=ghcr.io \
+            --docker-username="$OWNER" \
+            --docker-password="$GHCR_TOKEN" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to Kubernetes
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl apply -f k8s/deployement.yaml
+          kubectl rollout status deployment/backend-deployment --timeout=180s
+          kubectl rollout status deployment/frontend-deployment --timeout=180s
