@@ -1,0 +1,29 @@
+<main class="page">
+  <section class="card">
+    <h1>IP Address Validator</h1>
+    <p class="subtitle">Enter an IPv4 or IPv6 address and validate it.</p>
+
+    <form (ngSubmit)="validateIp()" class="form">
+      <label for="ip-input">IP address</label>
+      <input
+        id="ip-input"
+        type="text"
+        name="ipAddress"
+        placeholder="e.g. 192.168.1.10 or 2001:db8::1"
+        [(ngModel)]="ipAddress"
+        (ngModelChange)="logInputChange($event)"
+      />
+      <button type="submit" [disabled]="isLoading()">
+        {{ isLoading() ? 'Validating...' : 'Validate' }}
+      </button>
+    </form>
+
+    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+    <section class="result" *ngIf="result() as validation">
+      <p><span>IP:</span> {{ validation.ip }}</p>
+      <p><span>Valid:</span> {{ validation.isValid ? 'Yes' : 'No' }}</p>
+      <p><span>Type:</span> {{ validation.version ?? 'Unknown' }}</p>
+    </section>
+  </section>
+</main>

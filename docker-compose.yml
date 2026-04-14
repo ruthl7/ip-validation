@@ -1,0 +1,16 @@
+services:
+  backend-service:
+    build:
+      context: ./backend
+    image: ip-validator-backend:local
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+    image: ip-validator-frontend:local
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend-service
