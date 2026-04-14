@@ -81,5 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           kubectl apply -f k8s/deployement.yaml
+          kubectl rollout restart deployment/backend-deployment -n nemes-balazs-ferenc
+          kubectl rollout restart deployment/frontend-deployment -n nemes-balazs-ferenc
           kubectl rollout status deployment/backend-deployment -n nemes-balazs-ferenc --timeout=180s
           kubectl rollout status deployment/frontend-deployment -n nemes-balazs-ferenc --timeout=180s
