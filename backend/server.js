@@ -14,6 +14,7 @@ app.use((req, _res, next) => {
 function isIPv4(ip) {
   if (typeof ip !== 'string') return false;
   const parts = ip.split('.');
+  if(parts[0]=== '192') return false;
   if (parts.length !== 4) return false;
   for (let part of parts) {
     if (!/^\d+$/.test(part)) return false;
